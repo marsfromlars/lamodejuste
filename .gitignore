@@ -1,3 +1,20 @@
+# macOS
+.DS_Store
+
+# pico-8
+backup
+bbs
+cdata
+cstore
+plates
+activity_log.txt
+carts/demos
+carts/games
+config.txt
+favourites.txt
+log.txt
+sdl_controllers.txt
+
 # Compiled Lua sources
 luac.out
 

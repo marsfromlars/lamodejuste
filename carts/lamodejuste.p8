@@ -10,9 +10,9 @@ function _init()
     midx, midy = 64, 64
     white, black, red = 7, 0, 8
     up, down, action, action2 = 2, 3, 5, 4
-    menu = {"fan","flags"}
+    menu = {"fan","flags","spacerock"}
     selected = 1
-    prog_menu, prog_fan, prog_flags = 0, 1, 2
+    prog_menu, prog_fan, prog_flags, prog_spacerock = 0, 1, 2, 3
     prog = prog_menu
     flag_created = false
 end
@@ -31,6 +31,8 @@ function _update()
         update_fan()
     elseif prog == prog_flags then
         update_flags()
+    elseif prog == prog_spacerock then
+        update_spacerock()
     end
 end
 
@@ -61,7 +63,10 @@ function update_fan()
 end
 
 function update_flags()
-    if btnp( action2 ) then flag_created = false end
+    if btnp( down ) then flag_created = false end
+end
+
+function update_spacerock()
 end
 
 -->8
@@ -72,13 +77,27 @@ function _draw()
         draw_fan()
     elseif prog == prog_flags then
         draw_flags()
+    elseif prog == prog_spacerock then
+        draw_spacerock()
     end
     draw_status()
 end
 
 function draw_status()
     rectfill(0,0,127,7,0)
-    print( flr(time()).." prog/sel: "..prog.."/"..selected, 0, 0, white )
+    print( time_string().." prog/sel: "..prog.."/"..selected, 0, 0, white )
+end
+
+function time_string()
+    return two_digits(stat(83))..":"..two_digits(stat(84))..":"..two_digits(stat(85))
+end
+
+function two_digits(num)
+    if num < 9 then
+        return "0"..num
+    else
+        return num
+    end
 end
 
 function draw_menu()
@@ -115,9 +134,17 @@ function draw_flags()
         rectfill(0,top,127,top+h,flr(rnd(16)))
         rectfill(0,top+h,127,top+2*h,flr(rnd(16)))
         rectfill(0,top+2*h,127,top+3*h,flr(rnd(16)))
-        print( "press 🅾️ for next flag", 0, 121, white )
+        print( "press ⬇️ (down) for next flag", 0, 121, white )
         flag_created = true
     end
+end
+
+function draw_spacerock()
+    print( "spacerock", 0, 10, white )
+    sset(1,1,red)
+    sset(3,3,red)
+    sset(5,5,red)
+    spr(0,0,20)
 end
 
 __gfx__
