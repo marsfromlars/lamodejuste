@@ -13,7 +13,7 @@ function _init()
     menu = {"fan","flags","spacerock"}
     selected = 1
     prog_menu, prog_fan, prog_flags, prog_spacerock = 0, 1, 2, 3
-    prog = prog_spacerock
+    prog = prog_menu
     flag_created = false
     kx, ky, lx, ly = 50,50,70,70
 end
@@ -68,10 +68,6 @@ function update_flags()
 end
 
 function update_spacerock()
-    if rnd(100)>50 then lx+=1 else lx-=1 end
-    if rnd(100)>50 then ly+=1 else ly-=1 end
-    if rnd(100)>50 then kx+=1 else kx-=1 end
-    if rnd(100)>50 then ky+=1 else ky-=1 end
 end
 
 -->8
@@ -145,14 +141,6 @@ function draw_flags()
 end
 
 function draw_spacerock()
-    cls(green)
-    print( "spacerock", 0, 10, white )
-    -- sset(1,1,red)
-    -- sset(3,3,red)
-    -- sset(5,5,red)
-    spr(0,lx,ly)
-    -- sset(5,5,green)
-    spr(1,kx,ky,8,8,true,false)
 end
 
 __gfx__
