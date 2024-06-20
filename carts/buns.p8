@@ -6,11 +6,11 @@ function _init()
     game_splash,game_loop = 0,1
     game=game_splash
     show_splash()
-    linux=createBunny("linux",50,70,false,0)
-    kitty=createBunny("kitty",50,70,true,1)
+    linux=create_bunny("linux",50,70,false,0)
+    kitty=create_bunny("kitty",50,70,true,1)
 end
 
-function createBunny(name,x,y,dir,sprite_index)
+function create_bunny(name,x,y,dir,sprite_index)
     local bunny={}
     bunny.name=name
     bunny.x=x
