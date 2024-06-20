@@ -1,5 +1,54 @@
 pico-8 cartridge // http://www.pico-8.com
 version 42
+__lua__
+
+black,dark_blue,purple,dark_green,brown,dark_gray,gray,white,red,orange,yellow,green,blue,lavender,pink,beige=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+
+function _init()
+	music(0)
+    game_splash,game_loop = 0,1
+    game=game_splash
+    show_splash()
+end
+
+-->8
+
+function _update() 
+    if game == game_splash then
+        if t() > 1 then game=game_loop end
+    else
+    end
+end
+
+-->8
+
+function _draw()
+end
+
+function show_splash()
+    cls(blue)
+    x,y=128/2-2*6,60
+    print("wurmi",x,y,black)
+    y+=7
+    x=128/2-10*5
+    print("(C) 1985,2024",x,y,dark_gray)
+    x+=55
+    colors={}
+    c=0
+    line(x,y+c,x+3,y+c,blue)
+    c+=1
+    line(x,y+c,x+3,y+c,green)
+    c+=1
+    line(x,y+c,x+3,y+c,yellow)
+    c+=1
+    line(x,y+c,x+3,y+c,pink)
+    c+=1
+    line(x,y+c,x+3,y+c,red)
+    x+=5
+    print("lamosoft",x,y,dark_gray)
+end
+
+
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -17,5 +66,5 @@ __music__
 01 01424344
 00 02424344
 00 03424344
-02 04424344
+04 04424344
 
