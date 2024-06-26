@@ -5,10 +5,19 @@ __lua__
 black,dark_blue,purple,dark_green,brown,dark_gray,gray,white,red,orange,yellow,green,blue,lavender,pink,beige=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 
 function _init()
+    defaults()
 	music(0)
     game_splash,game_loop = 0,1
     game=game_splash
     show_splash()
+end
+
+-->8
+
+function defaults() 
+    maxx, maxy = 128, 128
+    black,dark_blue,purple,dark_green,brown,dark_gray,gray,white,red,orange,yellow,green,blue,lavender,pink,beige=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+    up, down, action, action2 = 2, 3, 5, 4
 end
 
 -->8

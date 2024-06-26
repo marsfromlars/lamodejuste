@@ -3,24 +3,54 @@ version 42
 __lua__
 -- la mode juste
 -- (c) 1985,2024 lamosoft
+
 function _init()
-    cls()
-    print( "starting up" )
+    defaults()
+    sky = { dark_gray, yellow, orange, red, purple, dark_blue }
+    bluesky = { blue, gray, lavender, dark_blue }
     pos = 0
     dir, step = 1, 3
     charw, charh = 5, 7
-    midx, midy = 64, 64
-    white, black, red, green = 7, 0, 8, 3
-    up, down, action, action2 = 2, 3, 5, 4
     menu = {"fan","flags","spacerock"}
     selected = 1
     prog_menu, prog_fan, prog_flags, prog_spacerock = 0, 1, 2, 3
-    prog = prog_menu
+    prog = prog_spacerock
     flag_created = false
     kx, ky, lx, ly = 50,50,70,70
+    cls()
+    print( "starting up" )
 end
 
 -->8
+-- utils ---------------------------------------------------------------
+
+function defaults() 
+    maxx, maxy = 128, 128
+    black,dark_blue,purple,dark_green,brown,dark_gray,gray,white,red,orange,yellow,green,blue,lavender,pink,beige=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+    up, down, action, action2 = 2, 3, 5, 4
+end
+
+function time_string()
+    return two_digits(stat(93))..":"..two_digits(stat(94))..":"..two_digits(stat(95))
+end
+
+function two_digits(num)
+    if num < 9 then
+        return "0"..num
+    else
+        return num
+    end
+end
+
+-- horizontal line
+function hor( y, col )
+    line( 0, y, 128, y, col )
+end
+
+
+-->8
+-- update handling ---------------------------------------------------------------
+
 function _update() 
     if btnp( action ) then 
         if prog != prog_menu then
@@ -73,6 +103,8 @@ function update_spacerock()
 end
 
 -->8
+-- drawing ---------------------------------------------------------------
+
 function _draw()
     if prog == prog_menu then
         draw_menu()
@@ -91,23 +123,11 @@ function draw_status()
     print( time_string().." prog/sel: "..prog.."/"..selected, 0, 0, white )
 end
 
-function time_string()
-    return two_digits(stat(83))..":"..two_digits(stat(84))..":"..two_digits(stat(85))
-end
-
-function two_digits(num)
-    if num < 9 then
-        return "0"..num
-    else
-        return num
-    end
-end
-
 function draw_menu()
     w = 10 * charw + 1
     h = 5 * charh + 1
-    x = midx - w/2
-    y = midy - h/2
+    x = maxx/2 - w/2
+    y = maxy/2 - h/2
     rectfill(x,y,x+w,y+h,black)
     rect(x,y,x+w,y+h,white)
     for i = 1, min(5,#menu) do
@@ -143,6 +163,23 @@ function draw_flags()
 end
 
 function draw_spacerock()
+    cls( black )
+    draw_space( true, 2, sky )
+    draw_space( false, 2, bluesky )
+end
+
+function draw_space( up, resolution, colors )
+    if up then step = -1 else step = 1 end
+    y=maxy/2 + step * 15
+    color = 0
+    while y >= 0 and y < maxy do
+        for i=0,resolution do
+            hor(y+i,colors[color])
+        end
+        color += 1
+        if color > #colors then color = #colors end
+        y += step*resolution
+    end
 end
 
 __gfx__
