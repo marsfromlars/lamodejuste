@@ -13,12 +13,16 @@ function _init()
     pos = 0
     dir, step = 1, 3
     charw, charh = 5, 7
-    app_num = 1
     apps = { create_menu(), create_fan(), create_flags(), create_spacerock() }
-    app = apps[ app_num ]
+    return_to_menu()
     sprite_rock = 0
     flag_created = false
     print( "starting up "..app.name )
+end
+
+function return_to_menu()
+    app_num = 1
+    app = apps[ app_num ]
 end
 
 function _update()
@@ -48,14 +52,14 @@ function create_menu()
         if btnp( up ) then self.selected -= 1 end
         if btnp( down ) then self.selected += 1 end
         if self.selected < 1 then
-            self.selected = #menu - 1
-        elseif self.selected > #menu - 1 then
+            self.selected = #apps - 1
+        elseif self.selected > #apps - 1 then
             self.selected = 1
         end
         if btnp( action ) then 
             app_num = self.selected + 1
             app = apps[ app_num ]
-            app.activate()
+            app:activate()
         end
     end
 
@@ -95,6 +99,7 @@ function create_fan()
     end
 
     function fan:update()
+        if btnp( action ) then return_to_menu() end
         color = 1+flr(rnd(15))
         pos += step
         if pos > 127 or pos < 0 then
@@ -129,6 +134,7 @@ function create_flags()
     end
 
     function flags:update()
+        if btnp( action ) then return_to_menu() end
         if btnp( down ) then flag_created = false end
     end
 
@@ -159,7 +165,12 @@ function create_spacerock()
         name = "spacerock"
     }
 
+    function spacerock:activate()
+        cls()
+    end
+
     function spacerock:update()
+        if btnp( action ) then return_to_menu() end
     end
 
     function spacerock:draw()
