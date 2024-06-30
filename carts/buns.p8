@@ -12,7 +12,7 @@ function _init()
     kitty=create_bunny("kitty",50,70,true,1)
     flowers={}
     for i=0,20 do
-        add(flowers,crete_flower())
+        add(flowers,create_flower())
     end
 end
 
@@ -23,7 +23,6 @@ function defaults()
     black,dark_blue,purple,dark_green,brown,dark_gray,gray,white,red,orange,yellow,green,blue,lavender,pink,beige=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
     up, down, action, action2 = 2, 3, 5, 4
 end
-
 
 function create_bunny(name,x,y,dir,sprite_index)
     local bunny={}
@@ -42,7 +41,7 @@ function create_bunny(name,x,y,dir,sprite_index)
     return bunny
 end
 
-function crete_flower()
+function create_flower()
     local flower={}
     flower.x=rnd(maxx-5)
     flower.y=rnd(maxy-6)

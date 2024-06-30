@@ -5,20 +5,203 @@ __lua__
 -- (c) 1985,2024 lamosoft
 
 function _init()
+    cls()
+    srand(33)
     defaults()
     sky = { dark_gray, yellow, orange, red, purple, dark_blue }
     bluesky = { blue, gray, lavender, dark_blue }
     pos = 0
     dir, step = 1, 3
     charw, charh = 5, 7
-    menu = {"fan","flags","spacerock"}
-    selected = 1
-    prog_menu, prog_fan, prog_flags, prog_spacerock = 0, 1, 2, 3
-    prog = prog_spacerock
+    app_num = 1
+    apps = { create_menu(), create_fan(), create_flags(), create_spacerock() }
+    app = apps[ app_num ]
+    sprite_rock = 0
     flag_created = false
-    kx, ky, lx, ly = 50,50,70,70
-    cls()
-    print( "starting up" )
+    print( "starting up "..app.name )
+end
+
+function _update()
+    if app == nil then return end
+    app:update()
+end
+
+function _draw()
+    if app == nil then return end
+    app:draw()
+    rectfill(0,0,127,7,0)
+    print( time_string().." "..app_num.." "..app.name, 0, 0, white )
+
+end
+
+-->8
+-- app: menu ---------------------------------------------------------------
+
+function create_menu()
+
+    local menu = {
+        name = "menu",
+        selected = 1
+    }
+
+    function menu:update()
+        if btnp( up ) then self.selected -= 1 end
+        if btnp( down ) then self.selected += 1 end
+        if self.selected < 1 then
+            self.selected = #menu - 1
+        elseif self.selected > #menu - 1 then
+            self.selected = 1
+        end
+        if btnp( action ) then 
+            app_num = self.selected + 1
+            app = apps[ app_num ]
+            app.activate()
+        end
+    end
+
+    function menu:draw()
+        w = 10 * charw + 1
+        h = 5 * charh + 1
+        x = maxx/2 - w/2
+        y = maxy/2 - h/2
+        rectfill(x,y,x+w,y+h,black)
+        rect(x,y,x+w,y+h,white)
+        for i=1,min(5,#apps-1) do
+            yrow = y+((i-1)*charh)+2
+            textcolor = white
+            if i == self.selected then
+                rectfill(x+1,yrow-1,x+w-1,yrow+charh-2,red)
+                textcolor = black
+            end
+            print(apps[i+1].name,x+2,yrow,textcolor)
+        end
+    end
+
+    return menu
+
+end
+
+-->8
+-- app: fan ---------------------------------------------------------------
+
+function create_fan()
+
+    local fan = {
+        name = "fan"
+    }
+
+    function fan:activate()
+        cls()
+    end
+
+    function fan:update()
+        color = 1+flr(rnd(15))
+        pos += step
+        if pos > 127 or pos < 0 then
+            dir = -dir
+            step = dir * ( 2 + flr(rnd(10)) )
+            pos = max( 0, pos )
+            pos = min( 127, pos )
+        end
+    end
+
+    function fan:draw()
+        rectfill(0,120,127,127,0)
+        print( pos, pos, 120, color )    
+        line(64,7,pos,118,color)
+    end
+
+    return fan
+
+end
+
+-->8
+-- app: flags ---------------------------------------------------------------
+
+function create_flags()
+
+    local flags = {
+        name = "flags"
+    }
+
+    function flags:activate()
+        cls()
+    end
+
+    function flags:update()
+        if btnp( down ) then flag_created = false end
+    end
+
+    function flags:draw()
+        if not flag_created then
+            cls()
+            top = 10
+            bot = 120
+            h = (bot-top)/3
+            rectfill(0,top,127,top+h,flr(rnd(16)))
+            rectfill(0,top+h,127,top+2*h,flr(rnd(16)))
+            rectfill(0,top+2*h,127,top+3*h,flr(rnd(16)))
+            print( "press ⬇️ (down) for next flag", 0, 121, white )
+            flag_created = true
+        end
+    end
+
+    return flags
+
+end
+
+-->8
+-- app: spacerock ---------------------------------------------------------------
+
+function create_spacerock()
+
+    local spacerock = {
+        name = "spacerock"
+    }
+
+    function spacerock:update()
+    end
+
+    function spacerock:draw()
+        self:draw_space( true, 2, sky )
+        self:draw_space( false, 2, bluesky )
+        rock = create_rock()
+    end
+
+    function spacerock:draw_space( up, resolution, colors )
+        if up then step = -1 else step = 1 end
+        y=maxy/2 + step * 15
+        color = 0
+        while y >= 0 and y < maxy do
+            for i=0,resolution do
+                hor(y+i,colors[color])
+            end
+            color += 1
+            if color > #colors then color = #colors end
+            y += step*resolution
+        end
+    end
+
+    return spacerock
+
+end
+
+function create_rock()
+    local rock = {
+        x = maxx,
+        y = maxy / 2 - 10 + rnd(20)
+    }
+    function rock:update()
+        self.x -= 0.1
+        printh( "update "..self.x )
+    end
+    function rock:draw()
+        if self == nil then
+            printh( "self==nil" )
+        end
+        spr( sprite_rock, self.x, self.y )
+    end
+    return rock
 end
 
 -->8
@@ -47,150 +230,15 @@ function hor( y, col )
     line( 0, y, 128, y, col )
 end
 
-
--->8
--- update handling ---------------------------------------------------------------
-
-function _update() 
-    if btnp( action ) then 
-        if prog != prog_menu then
-            prog = prog_menu
-            return
-        end
-    end
-    if prog == prog_menu then
-        update_menu()
-    elseif prog == prog_fan then
-        update_fan()
-    elseif prog == prog_flags then
-        update_flags()
-    elseif prog == prog_spacerock then
-        update_spacerock()
-    end
-end
-
-function update_menu() 
-    if btnp( up ) then selected = selected - 1 end
-    if btnp( down ) then selected = selected + 1 end
-    if btnp( action ) then 
-        prog = selected 
-        cls()
-        flag_created = false
-    end
-    if selected < 1 then
-        selected = #menu
-    elseif selected > #menu then
-        selected = 1
-    end
-end
-
-function update_fan()
-    color = 1+flr(rnd(15))
-    pos += step
-    if pos > 127 or pos < 0 then
-        dir = -dir
-        step = dir * ( 2 + flr(rnd(10)) )
-        pos = max( 0, pos )
-        pos = min( 127, pos )
-    end
-end
-
-function update_flags()
-    if btnp( down ) then flag_created = false end
-end
-
-function update_spacerock()
-end
-
--->8
--- drawing ---------------------------------------------------------------
-
-function _draw()
-    if prog == prog_menu then
-        draw_menu()
-    elseif prog == prog_fan then
-        draw_fan()
-    elseif prog == prog_flags then
-        draw_flags()
-    elseif prog == prog_spacerock then
-        draw_spacerock()
-    end
-    draw_status()
-end
-
-function draw_status()
-    rectfill(0,0,127,7,0)
-    print( time_string().." prog/sel: "..prog.."/"..selected, 0, 0, white )
-end
-
-function draw_menu()
-    w = 10 * charw + 1
-    h = 5 * charh + 1
-    x = maxx/2 - w/2
-    y = maxy/2 - h/2
-    rectfill(x,y,x+w,y+h,black)
-    rect(x,y,x+w,y+h,white)
-    for i = 1, min(5,#menu) do
-        yrow = y+((i-1)*charh)+2
-        textcolor = white
-        if i == selected then
-            rectfill(x+1,yrow-1,x+w-1,yrow+charh-2,red)
-            textcolor = black
-        end
-        print(menu[i],x+2,yrow,textcolor)
-    end
-end
-
-function draw_fan()
-    rectfill(0,120,127,127,0)
-    -- cls()
-    print( pos, pos, 120, color )    
-    line(64,7,pos,118,color)
-end
-
-function draw_flags()
-    if not flag_created then
-        cls()
-        top = 10
-        bot = 120
-        h = (bot-top)/3
-        rectfill(0,top,127,top+h,flr(rnd(16)))
-        rectfill(0,top+h,127,top+2*h,flr(rnd(16)))
-        rectfill(0,top+2*h,127,top+3*h,flr(rnd(16)))
-        print( "press ⬇️ (down) for next flag", 0, 121, white )
-        flag_created = true
-    end
-end
-
-function draw_spacerock()
-    cls( black )
-    draw_space( true, 2, sky )
-    draw_space( false, 2, bluesky )
-end
-
-function draw_space( up, resolution, colors )
-    if up then step = -1 else step = 1 end
-    y=maxy/2 + step * 15
-    color = 0
-    while y >= 0 and y < maxy do
-        for i=0,resolution do
-            hor(y+i,colors[color])
-        end
-        color += 1
-        if color > #colors then color = #colors end
-        y += step*resolution
-    end
-end
-
 __gfx__
-00f0f000001010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00f0f000001010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0ffff000011110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-f0f0f000101010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-ffffff00111111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0ffffff0011111100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0ffffff7011111110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-fffffff0111111100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00666600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+06555550000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+65505551000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+65555051000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+65055551000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+65555051000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+05505510000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00111100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __label__
 77007770000077707070000077007770000077707770077007700070077077707000000000007700007077000000000000000000000000000000000000000000
 07007070070070007070070007000070000070707070707070000700700070007000070000000700070007000000000000000000000000000000000000000000
