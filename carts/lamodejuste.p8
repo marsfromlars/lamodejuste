@@ -222,7 +222,6 @@ function create_rock()
     }
     function rock:update()
         self.x -= self.speed
-        printh( "update "..self.x )
     end
     function rock:draw()
         spr( self.sprite_num, self.x, self.y )
@@ -234,15 +233,20 @@ function create_spaceship()
     local spaceship = {
         x = 10,
         y = maxy / 2,
-        sprite_num = 4
+        sprite_num = 4,
+        flame = create_animation({1,2,3},10)
     }
     function spaceship:update()
         if btnp(up) then self.y -= 1 end
         if btnp(down) then self.y += 1 end
+        self.flame.x=self.x-8
+        self.flame.y=self.y
+        self.flame:update()
     end
     function spaceship:draw()
         spr( self.sprite_num, self.x, self.y )
         spr( self.sprite_num+1, self.x+8, self.y )
+        self.flame:draw()
     end
     return spaceship
 end
@@ -271,6 +275,30 @@ end
 -- horizontal line
 function hor( y, col )
     line( 0, y, 128, y, col )
+end
+
+function create_animation(_sprites,_frames)
+    local animation = {
+        sprites = _sprites,
+        frames = _frames,
+        frame_counter = _frames,
+        sprite_num = #_sprites,
+        x = 0,
+        y = 0
+    }
+    function animation:update()
+        self.frame_counter -= 1
+        if self.frame_counter < 0 then
+            self.frame_counter = self.frames
+            self.sprite_num += 1
+            if self.sprite_num > #self.sprites then self.sprite_num = 1 end
+        end
+    end
+    function animation:draw()
+        printh(self.sprite_num.." "..self.sprites[self.sprite_num])
+        spr( self.sprites[self.sprite_num], self.x, self.y )
+    end
+    return animation
 end
 
 __gfx__
