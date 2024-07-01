@@ -16,7 +16,6 @@ function _init()
     apps = { create_menu(), create_fan(), create_flags(), create_spacerock() }
     return_to_menu()
     sprite_rock = 0
-    flag_created = false
     print( "starting up "..app.name )
 end
 
@@ -126,20 +125,21 @@ end
 function create_flags()
 
     local flags = {
-        name = "flags"
+        name = "flags",
+        flag_created = false
     }
 
     function flags:activate()
-        cls()
+        self.flag_created = false
     end
 
     function flags:update()
         if btnp( action ) then return_to_menu() end
-        if btnp( down ) then flag_created = false end
+        if btnp( down ) then self.flag_created = false end
     end
 
     function flags:draw()
-        if not flag_created then
+        if not self.flag_created then
             cls()
             top = 10
             bot = 120
@@ -148,7 +148,7 @@ function create_flags()
             rectfill(0,top+h,127,top+2*h,flr(rnd(16)))
             rectfill(0,top+2*h,127,top+3*h,flr(rnd(16)))
             print( "press ⬇️ (down) for next flag", 0, 121, white )
-            flag_created = true
+            self.flag_created = true
         end
     end
 
@@ -229,7 +229,7 @@ function time_string()
 end
 
 function two_digits(num)
-    if num < 9 then
+    if num < 10 then
         return "0"..num
     else
         return num
