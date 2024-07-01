@@ -8,14 +8,11 @@ function _init()
     cls()
     srand(33)
     defaults()
-    sky = { dark_gray, yellow, orange, red, purple, dark_blue }
-    bluesky = { blue, gray, lavender, dark_blue }
     pos = 0
     dir, step = 1, 3
     charw, charh = 5, 7
     apps = { create_menu(), create_fan(), create_flags(), create_spacerock() }
     return_to_menu()
-    sprite_rock = 0
     print( "starting up "..app.name )
 end
 
@@ -24,7 +21,7 @@ function return_to_menu()
     app = apps[ app_num ]
 end
 
-function _update()
+function _update60()
     if app == nil then return end
     app:update()
 end
@@ -162,21 +159,27 @@ end
 function create_spacerock()
 
     local spacerock = {
-        name = "spacerock"
+        name = "spacerock",
+        sky = { dark_gray, yellow, orange, red, purple, dark_blue },
+        bluesky = { blue, gray, lavender, dark_blue }
     }
 
     function spacerock:activate()
-        cls()
+        rock = create_rock()
     end
 
     function spacerock:update()
         if btnp( action ) then return_to_menu() end
+        if rock != nil then rock:update() end
     end
 
     function spacerock:draw()
-        self:draw_space( true, 2, sky )
-        self:draw_space( false, 2, bluesky )
-        rock = create_rock()
+        cls()
+        self:draw_space( true, 2, self.sky )
+        self:draw_space( false, 2, self.bluesky )
+        if rock != nil then
+            rock:draw()
+        end
     end
 
     function spacerock:draw_space( up, resolution, colors )
@@ -200,17 +203,15 @@ end
 function create_rock()
     local rock = {
         x = maxx,
-        y = maxy / 2 - 10 + rnd(20)
+        y = maxy / 2 - 10 + rnd(20),
+        sprite_num = 0
     }
     function rock:update()
-        self.x -= 0.1
+        self.x -= 0.5
         printh( "update "..self.x )
     end
     function rock:draw()
-        if self == nil then
-            printh( "self==nil" )
-        end
-        spr( sprite_rock, self.x, self.y )
+        spr( self.sprite_num, self.x, self.y )
     end
     return rock
 end
