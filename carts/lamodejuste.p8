@@ -32,7 +32,6 @@ function _draw()
     app:draw()
     rectfill(0,0,127,7,0)
     print( time_string().." "..app_num.." "..app.name, 0, 0, white )
-
 end
 
 -->8
@@ -233,12 +232,14 @@ function create_spaceship()
     local spaceship = {
         x = 10,
         y = maxy / 2,
+        lateral = 0,
         sprite_num = 4,
         flame = create_animation({1,2,3},10)
     }
     function spaceship:update()
-        if btnp(up) then self.y -= 1 end
-        if btnp(down) then self.y += 1 end
+        if btnp(up) then self.lateral -= .2 end
+        if btnp(down) then self.lateral += .2 end
+        self.y+=self.lateral
         self.flame.x=self.x-8
         self.flame.y=self.y
         self.flame:update()
@@ -295,7 +296,6 @@ function create_animation(_sprites,_frames)
         end
     end
     function animation:draw()
-        printh(self.sprite_num.." "..self.sprites[self.sprite_num])
         spr( self.sprites[self.sprite_num], self.x, self.y )
     end
     return animation
