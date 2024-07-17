@@ -14,13 +14,14 @@ function _init()
 
     duck1 = create_animation()
     duck1.y = 20
-    duck1.images = { 1, 2, 3 }
+    duck1.images = { 0, 1, 2 }
     duck1.loop_forever = true
+    duck1.speed = 3
 
 end
 
 function _update()
-    duck1:update()
+     duck1:update()
 end
 
 function _draw()
@@ -49,7 +50,7 @@ function create_animation()
 
     local animation = {
         images = {},
-        current = 0,
+        current = 1,
         speed = 5,
         bounce = false,
         loops = 1,
@@ -59,6 +60,7 @@ function create_animation()
     }
 
     function animation:update()
+        printh( self.current )
         self.timer -= self.speed
         if self.timer < 0 then 
             self.timer = global.fps
@@ -67,7 +69,13 @@ function create_animation()
                 if self.bounce then
                     self.direction = -self.direction
                 end
-                self.current += self.direction
+            end
+            if not self.bounce then
+                if self.direction > 0 and self.current > #self.images then
+                    self.current = 1
+                elseif self.direction < 0 and self.current < 1 then
+                    self.current = #self.images
+                end
             end
         end
     end
